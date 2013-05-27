@@ -27,7 +27,7 @@ extern "C" SEXP normalize(SEXP strs, SEXP type, SEXP ctype) {
   for (int i = 0; i < n; i++) {
     icu::UnicodeString src(CHAR(STRING_ELT(strs, i)), charEncoding);
     icu::UnicodeString dst;
-    UErrorCode status;
+    UErrorCode status = U_ZERO_ERROR;
     icu::Normalizer::normalize(src, unmode, 0, dst, status);
     
     if (U_FAILURE(status)) {
@@ -46,3 +46,4 @@ extern "C" SEXP normalize(SEXP strs, SEXP type, SEXP ctype) {
   //return(R_NilValue);
   return(ret);
 }
+
