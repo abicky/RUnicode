@@ -1,1 +1,1 @@
-PKG_LIBS=-licuuc
+PKG_LIBS+=`icu-config --cppflags --ldflags`
