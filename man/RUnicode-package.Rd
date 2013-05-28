@@ -3,16 +3,16 @@
 \alias{RUnicode}
 \docType{package}
 \title{
-  A Function for Unicode Normalization
+Normalize Unicode characters
 }
 \description{
-  normalize unicode characters
+Normalize Unicode characters of a character vector or factor using ICU library
 }
 \details{
 \tabular{ll}{
 Package: \tab RUnicode\cr
-Version: \tab 0.1.0\cr
-Date: \tab 2011-04-16\cr
+Version: \tab 0.1.1\cr
+Date: \tab 2013-05-29\cr
 License: \tab GPL-2\cr
 }
 }

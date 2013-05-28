@@ -2,24 +2,24 @@
 \alias{unormalize}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Normalize unicode characters
+Normalize Unicode characters
 }
 \description{
-normalize unicode characters
+Normalize Unicode characters of a character vector or factor using ICU library
 }
 \usage{
-unormalize(strs, type = c("NFKC", "NFC", "NFKD", "NFD"), ctype = "utf8")
+unormalize(x, form = c("NFKC", "NFC", "NFKD", "NFD"), encoding = "utf8")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{strs}{
+  \item{x}{
     a character vector or factor
 }
-  \item{type}{
-    unicode normalization form. one of "NFD", "NFKD", "NFC", and "NFKC". default is "NFKC".
+  \item{form}{
+    Unicode normalization form, one of "NFD", "NFKD", "NFC", and "NFKC" (Default is "NFKC")
 }
-  \item{ctype}{
-    character encoding of 'strs'. default is "utf8".
+  \item{encoding}{
+    character encoding of `x` (Default is "utf8")
 }
 }
 \details{
@@ -49,11 +49,14 @@ unormalize(strs, type = c("NFKC", "NFC", "NFKD", "NFD"), ctype = "utf8")
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-        unormalize(c("アイウエオ", "ｱｲｳｴｵ"))
-        # "アイウエオ" "アイウエオ"
+x <- c("\uff71\uff72\uff73", "\uff11\uff12\uff13")
+x
+unormalize(x, "NFKC")
 
-        unormalize(c("アイウエオ", "ｱｲｳｴｵ"), "NFD")
-        # "アイウエオ" "ｱｲｳｴｵ"
+ga <- "\u304c"
+ga
+charToRaw(ga)
+charToRaw(unormalize(ga, "NFD"))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

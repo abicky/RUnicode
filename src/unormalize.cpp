@@ -1,13 +1,31 @@
 #include <R.h>
-#include <Rdefines.h>    
+#include <Rinternals.h>
 #include <unicode/normlzr.h>
 
-extern "C" SEXP normalize(SEXP strs, SEXP type, SEXP ctype) {
-  const int n = LENGTH(strs);
-  const char* charEncoding = CHAR(STRING_ELT(ctype, 0));
+void _normalize(const char *str, char **buf, const char *encoding, UNormalizationMode unmode) {
+  icu::UnicodeString src(str, encoding);
+  icu::UnicodeString dst;
+  UErrorCode status = U_ZERO_ERROR;
+  icu::Normalizer::normalize(src, unmode, 0, dst, status);
+
+  if (U_FAILURE(status)) {
+    error(u_errorName(status));
+  }
+
+  int32_t len = dst.extract(0, dst.length(), NULL, encoding);
+  *buf = (char *)malloc(len + 1);
+  if (*buf == NULL) {
+    error("Failed to allocate memory (%d bytes)", len + 1);
+  }
+  dst.extract(0, dst.length(), *buf, encoding);
+}
+
+extern "C" SEXP normalize(SEXP texts, SEXP type, SEXP ctype) {
+  const int n = LENGTH(texts);
+  const char* encoding = CHAR(STRING_ELT(ctype, 0));
   SEXP ret;
   PROTECT(ret = allocVector(STRSXP, n));
-  
+
   UNormalizationMode unmode;
   switch(INTEGER(type)[0]) {
   case 0:
@@ -22,28 +40,17 @@ extern "C" SEXP normalize(SEXP strs, SEXP type, SEXP ctype) {
   case 3:
     unmode = UNORM_NFKC;
     break;
+  default:
+    error("Invalid Unicode form");
   }
-  
-  for (int i = 0; i < n; i++) {
-    icu::UnicodeString src(CHAR(STRING_ELT(strs, i)), charEncoding);
-    icu::UnicodeString dst;
-    UErrorCode status = U_ZERO_ERROR;
-    icu::Normalizer::normalize(src, unmode, 0, dst, status);
-    
-    if (U_FAILURE(status)) {
-      printf("Warnings: %s\n", u_errorName(status));
-    }
-    
-    int32_t len = dst.extract(0, dst.length(), NULL, charEncoding);
-    char buf[len + 1];
-    dst.extract(0, dst.length(), buf, "utf-8");
 
+  for (int i = 0; i < n; ++i) {
+    char *buf;
+    _normalize(CHAR(STRING_ELT(texts, i)), &buf, encoding, unmode);
     SET_STRING_ELT(ret, i, mkChar(buf));
+    free(buf);
   }
 
   UNPROTECT(1);
-  
-  //return(R_NilValue);
   return(ret);
 }
-

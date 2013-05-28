@@ -1,14 +1,11 @@
-unormalize <-
-function(strs, type = c("NFKC", "NFC", "NFKD", "NFD"), ctype = "utf8") {
-    type <- match.arg(type)
-    type <- switch(type, NFD = 0, NFKD = 1, NFC = 2, NFKC = 3)
-    if (class(strs) == "character") {
-        .Call("normalize", strs, as.integer(type), ctype)
-    } else if (class(strs) == "factor") {
-        levels(strs) <- .Call("normalize", levels(strs), as.integer(type), ctype)
-        strs
+unormalize <- function(x, form = c("NFKC", "NFC", "NFKD", "NFD"), encoding = "utf8") {
+    form <- switch(match.arg(form), NFD = 0L, NFKD = 1L, NFC = 2L, NFKC = 3L)
+    if (class(x) == "character") {
+        return(.Call("normalize", x, form, encoding))
+    } else if (class(x) == "factor") {
+        levels(x) <- .Call("normalize", levels(x), form, encoding)
+        return(x)
     } else {
-        stop("The fist argument should be either 'character' or 'factor'!")
+        stop("`x` should be either 'character' or 'factor'!")
     }
 }
-
